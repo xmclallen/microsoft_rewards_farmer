@@ -2,14 +2,21 @@ const puppeteer = require('puppeteer-core');
 const axios = require('axios');
 const config = require('./settings.json');
 
-(async () => {
+const main = () => {
+	for ( user of config.accounts ){
+		farmPoints( user );
+	}
+};
+
+const farmPoints = async ( userInfo ) => {
+
 	const browser = await puppeteer.launch({
 		executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
 		headless: false
 	});
 	const page = await browser.newPage();
 
-	await loginToMicrosoftLive( page , config.accounts[0]);
+	await loginToMicrosoftLive( page , userInfo );
 
 	const rewards = await getRewardsInfo( page );
 
@@ -25,15 +32,17 @@ const config = require('./settings.json');
 	console.log( JSON.stringify( endRewards ) );
 
 	console.log('DONE!');
+	console.log();
+	console.log(`[~~ Points Summary For ${userInfo.username} ~~]`)
 
 	displayRedemptionOptions( endRewards );
 
-	await browser.close();
-})();
+	browser.close();
+};
 
 
 const loginToMicrosoftLive = async ( page, auth ) => {
-	console.log( JSON.stringify(config) );
+
 	const url = `https://login.live.com`;
 
 	await page.goto( url );
@@ -96,10 +105,12 @@ const switchToMobile = async ( page ) => {
 };
 
 const displayRedemptionOptions = ( points ) => {
+
 	console.log(`Your point value of ${points} is roughly equal to:`);
 	for( reward of config.rewards ){
-		console.log(`${parseFloat(points) / parseFloat(reward.cost)} of ${reward.title} ( ${reward.cost} pts)`)
+		console.log(`${(points / reward.cost * 100 ).toFixed(2)}% of ${reward.title} ( ${reward.cost} pts)`)
+		console.log(`   or ${(points / reward.discounted * 100 ).toFixed(2)}% of ${reward.discounted} pts at the discounted Level 2 rate`)
 	}
 };
 
-
+main ();
