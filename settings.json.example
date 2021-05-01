@@ -1,0 +1,23 @@
+{
+	"accounts":[{
+		"username": "yourname@emaildomain.com",
+		"password": "YourStrongPassword1!"	
+	}],
+	"rewards":[
+		{
+			"title": "1 Month of Xbox Game Pass for PC",
+			"cost": "10,000",
+			"discounted": "6,800"
+		},
+		{
+			"title": "$10 Xbox Gift Card",
+			"cost": "10,000",
+			"discounted": "9,300"
+		},
+		{
+			"title": "1 Month of Xbox Game Pass Ultimate",
+			"cost": "14,000",
+			"discounted": "12,000"
+		}
+	]
+}

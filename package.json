@@ -1,0 +1,16 @@
+{
+  "name": "msrewards",
+  "version": "1.0.0",
+  "description": "Use Microsoft Edge automation tools on Microsoft Edge (Chromium) to farm Microsoft Rewards Points",
+  "main": "autoFarm.js",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "puppeteer-core": "^9.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Xavier McLallen",
+  "license": "WTFPL"
+}
