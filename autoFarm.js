@@ -12,10 +12,14 @@ const farmPoints = async ( userInfo ) => {
 
 	const browser = await puppeteer.launch({
 		executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+		args: [
+			'--inprivate',
+		  ],
 		headless: false
-	});
-	const page = await browser.newPage();
-
+	});	
+	const pages = await browser.pages();
+	const page = pages[0];
+	
 	await loginToMicrosoftLive( page , userInfo );
 
 	const rewards = await getRewardsInfo( page );
@@ -54,9 +58,12 @@ const loginToMicrosoftLive = async ( page, auth ) => {
 	await page.waitForTimeout( 2000 )
 
 	// Enter password, wait for next page to load.
-	await page.waitForSelector(`input[name="passwd"]`);
-	await page.type(`input[name="passwd"]`, auth.password);
-	await page.click(`input[id="idSIButton9"]`);
+	if (auth.password != "")
+	{
+		await page.waitForSelector(`input[name="passwd"]`);
+		await page.type(`input[name="passwd"]`, auth.password);
+		await page.click(`input[id="idSIButton9"]`);
+	}
 	await page.waitForTimeout( 10000 );
 };
 
