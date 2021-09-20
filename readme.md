@@ -2,7 +2,7 @@
 
 ## Dependencies:
 
- - Microsoft Edge (Chromium based version). https://www.microsoft.com/edge/
+ - Google Chrome. https://www.google.fr/chrome/
 
 ## Installation:
 
