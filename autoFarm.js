@@ -11,11 +11,18 @@ const main = () => {
 const farmPoints = async ( userInfo ) => {
 
 	const browser = await puppeteer.launch({
-		executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+		executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+		args: [
+			'--incognito',
+		  ],
 		headless: false
-	});
-	const page = await browser.newPage();
-
+	});	
+	const pages = await browser.pages();
+	const page = pages[0];
+	page.setUserAgent(
+	  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36 Edg/93.0.961.52"
+	);
+	
 	await loginToMicrosoftLive( page , userInfo );
 
 	const rewards = await getRewardsInfo( page );
@@ -23,10 +30,10 @@ const farmPoints = async ( userInfo ) => {
 	console.log( JSON.stringify( rewards ) );
 	console.log('[BING]', 'Beginning searches.')
 
-	await runSearches( page );
+	await runSearches( page , 90/3); // 90 points max / 3 points per page
 
 	await switchToMobile( page );
-	await runSearches(page, 10);
+	await runSearches(page, 60/3); // 60 points max / 3 points per page
 
 	const endRewards = await getRewardsInfo( page );
 	console.log( JSON.stringify( endRewards ) );
@@ -53,11 +60,19 @@ const loginToMicrosoftLive = async ( page, auth ) => {
 	await page.click(`input[id="idSIButton9"]`);
 	await page.waitForTimeout( 2000 )
 
-	// Enter password, wait for next page to load.
-	await page.waitForSelector(`input[name="passwd"]`);
-	await page.type(`input[name="passwd"]`, auth.password);
+	// Enter password, then wait 2 seconds for next card to load
+	if (auth.password != "")
+	{
+		await page.waitForSelector(`input[name="passwd"]`);
+		await page.type(`input[name="passwd"]`, auth.password);
+		await page.click(`input[id="idSIButton9"]`);
+		await page.waitForTimeout( 2000 );		
+	}
+	
+	// Don't remind password, wait for next page to load.
+	await page.waitForSelector(`input[name="DontShowAgain"]`);
 	await page.click(`input[id="idSIButton9"]`);
-	await page.waitForTimeout( 10000 );
+	await page.waitForTimeout( 2000 );
 };
 
 const getRewardsInfo = async ( page ) => {
@@ -67,7 +82,13 @@ const getRewardsInfo = async ( page ) => {
 	// Click on the Rewards link
 
 	await page.waitForTimeout( 2000 );
-
+	
+	// Connect to Reward, wait for next page to load.
+	if (await page.$('a[id="raf-signin-link-id"]') !== null)
+	{
+		await page.click('a[id="raf-signin-link-id"]');
+		await page.waitForTimeout( 2000 );
+	}
 
 	const rewards = await page.evaluate(() => {
 		const rewardsSel = `#userBanner > mee-banner > div > div > div > div.info-columns > div:nth-child(1) > mee-banner-slot-2 > mee-rewards-user-status-item > mee-rewards-user-status-balance > div > div > div > div > div > p.bold.number.margin-top-1 > mee-rewards-counter-animation > span`;
@@ -87,8 +108,16 @@ const runSearches = async ( page, numOfSearches = 20) => {
 	console.log( terms );
 
 	for( term of terms ){
-		await page.goto(`${url}${term}`);
+		await page.goto(`${url}${term}`);	
+		
 		await page.waitForTimeout( 2000 );
+				
+		// Connect to Bing, wait for next page to load.
+		if (await page.$('input[id="id_a"]') !== null)
+		{
+			await page.click('input[id="id_a"]');
+			await page.waitForTimeout( 2000 );
+		}
 	}
 	return;
 };
